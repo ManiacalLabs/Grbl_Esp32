@@ -24,6 +24,8 @@
 
 #include "grbl.h"
 
+uint8_t ganged_mode = SQUARING_MODE_DUAL;
+
 void mc_line_kins(float *target, plan_line_data_t *pl_data, float *position)
 {
 	
@@ -51,20 +53,15 @@ void mc_line_kins(float *target, plan_line_data_t *pl_data, float *position)
 	#endif
 }
 
-
-
 // Execute linear motion in absolute millimeter coordinates. Feed rate given in millimeters/second
 // unless invert_feed_rate is true. Then the feed_rate means that the motion should be completed in
 // (1 minute)/feed_rate time.
 // NOTE: This is the primary gateway to the grbl planner. All line motions, including arc line
-// segments, must pass through this routine before being passed to the planner. The separation of
+// segments, must pass through this routine before being passed to the planner. The seperation of
 // mc_line and plan_buffer_line is done primarily to place non-planner-type functions from being
 // in the planner and to let backlash compensation or canned cycle integration simple and direct.
 void mc_line(float *target, plan_line_data_t *pl_data)
 {	
-	//grbl_sendf(CLIENT_SERIAL, "mc: %4.2f %4.2f \r\n", target[X_AXIS], target[Y_AXIS]);
-	//grbl_sendf(CLIENT_SERIAL, "off_x: %4.2f \r\n", gc_state.coord_system[X_AXIS]+gc_state.coord_offset[X_AXIS]);
-	
   // If enabled, check for soft limit violations. Placed here all line motions are picked up
   // from everywhere in Grbl.
   if (bit_istrue(settings.flags,BITFLAG_SOFT_LIMIT_ENABLE)) {
@@ -106,7 +103,7 @@ void mc_line(float *target, plan_line_data_t *pl_data)
 
 // Execute an arc in offset mode format. position == current xyz, target == target xyz,
 // offset == offset from current xyz, axis_X defines circle plane in tool space, axis_linear is
-// the direction of helical travel, radius == circle radius, is clockwise boolean. Used
+// the direction of helical travel, radius == circle radius, isclockwise boolean. Used
 // for vector transformation direction.
 // The arc is approximated by generating a huge number of tiny, linear segments. The chordal tolerance
 // of each segment is configured in settings.arc_tolerance, which is defined to be the maximum normal
@@ -256,12 +253,44 @@ void mc_homing_cycle(uint8_t cycle_mask)
   #endif
   {
     // Search to engage all axes limit switches at faster homing seek rate.
-    limits_go_home(HOMING_CYCLE_0);  // Homing cycle 0
+		if (! axis_is_squared(HOMING_CYCLE_0))
+			limits_go_home(HOMING_CYCLE_0);  // Homing cycle 0
+	  else {
+			ganged_mode = SQUARING_MODE_DUAL;
+			limits_go_home(HOMING_CYCLE_0);
+			ganged_mode = SQUARING_MODE_A;
+			limits_go_home(HOMING_CYCLE_0);
+			ganged_mode = SQUARING_MODE_B;
+			limits_go_home(HOMING_CYCLE_0);
+			ganged_mode = SQUARING_MODE_DUAL; // always return to dual 
+		}
+		
     #ifdef HOMING_CYCLE_1
-      limits_go_home(HOMING_CYCLE_1);  // Homing cycle 1
+		if (! axis_is_squared(HOMING_CYCLE_1))
+      limits_go_home(HOMING_CYCLE_1);
+		else {
+			ganged_mode = SQUARING_MODE_DUAL;
+			limits_go_home(HOMING_CYCLE_1);
+			ganged_mode = SQUARING_MODE_A;
+			limits_go_home(HOMING_CYCLE_1);
+			ganged_mode = SQUARING_MODE_B;
+			limits_go_home(HOMING_CYCLE_1);
+			ganged_mode = SQUARING_MODE_DUAL; // always return to dual 
+		}
     #endif
+		
     #ifdef HOMING_CYCLE_2
-      limits_go_home(HOMING_CYCLE_2);  // Homing cycle 2
+		if (! axis_is_squared(HOMING_CYCLE_2))
+      limits_go_home(HOMING_CYCLE_2);
+		else {
+			ganged_mode = SQUARING_MODE_DUAL;
+			limits_go_home(HOMING_CYCLE_2);
+			ganged_mode = SQUARING_MODE_A;
+			limits_go_home(HOMING_CYCLE_2);
+			ganged_mode = SQUARING_MODE_B;
+			limits_go_home(HOMING_CYCLE_2);
+			ganged_mode = SQUARING_MODE_DUAL; // always return to dual 
+		}
     #endif
     
     #ifdef HOMING_CYCLE_3
@@ -404,6 +433,7 @@ void mc_reset()
 		#ifdef ENABLE_SD_CARD
 			// do we need to stop a running SD job?
 			if (get_sd_state(false) == SDCARD_BUSY_PRINTING) {
+				//Report print stopped
 				report_feedback_message(MESSAGE_SD_FILE_QUIT);
 				closeFile();
 			}
@@ -421,9 +451,11 @@ void mc_reset()
       st_go_idle(); // Force kill steppers. Position has likely been lost.
     }
 		
+		#ifdef USE_GANGED_AXES
+			ganged_mode = SQUARING_MODE_DUAL; // in case an error occurred during squaring
+		#endif
+		
   }
 }
-
-
 
 

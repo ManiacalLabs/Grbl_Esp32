@@ -79,7 +79,7 @@ void IRAM_ATTR isr_control_inputs()
 		
 		
 		pin = system_control_get_state();
-		grbl_sendf(CLIENT_SERIAL, "Pin %d\r\n", pin);
+		//grbl_sendf(CLIENT_SERIAL, "Pin %d\r\n", pin);
 		
 		if (pin) {
 			if (bit_istrue(pin,CONTROL_PIN_INDEX_RESET)) 
@@ -98,17 +98,17 @@ void IRAM_ATTR isr_control_inputs()
 			}
 			
 			else if (pin == 96) {	
-				grbl_send(CLIENT_SERIAL, "Sw 1\r\n");			
+				//grbl_send(CLIENT_SERIAL, "Sw 1\r\n");			
 				Serial2Socket.push("$H\r");
 			}
 			
 			else if (pin == 80) {
-				grbl_send(CLIENT_SERIAL, "Sw 2\r\n");
+				//grbl_send(CLIENT_SERIAL, "Sw 2\r\n");
 				Serial2Socket.push("[ESP220]/1.nc\r");
 			}
 			
 			else if (pin == 48) {
-				grbl_send(CLIENT_SERIAL, "Sw 3\r\n");
+				//grbl_send(CLIENT_SERIAL, "Sw 3\r\n");
 				Serial2Socket.push("[ESP220]/2.nc\r");
 			}
 			
@@ -516,5 +516,4 @@ int32_t system_convert_corexy_to_y_axis_steps(int32_t *steps)
 {
 	return( (steps[A_MOTOR] - steps[B_MOTOR])/2 );
 }
-
 

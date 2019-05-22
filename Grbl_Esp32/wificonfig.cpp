@@ -38,7 +38,7 @@
 WiFiConfig wifi_config;
 
 String WiFiConfig::_hostname = "";
-
+bool WiFiConfig::_events_registered = false;
 WiFiConfig::WiFiConfig(){
 }
     
@@ -374,7 +374,7 @@ bool WiFiConfig::StartAP(){
     WiFi.softAPConfig(ip, ip, mask);
     //Start AP
     if(WiFi.softAP(SSID.c_str(), (password.length() > 0)?password.c_str():NULL, channel)) {
-        grbl_sendf(CLIENT_ALL,"\n[MSG:AP Started %s]\r\n", WiFi.softAPIP().toString().c_str());
+        grbl_sendf(CLIENT_ALL,"\n[MSG:Local access point %s started, %s]\r\n", SSID.c_str(), WiFi.softAPIP().toString().c_str());
         return true;
     } else {
         grbl_send(CLIENT_ALL,"[MSG:Starting AP failed]\r\n");
@@ -391,6 +391,8 @@ void WiFiConfig::StopWiFi(){
     if((WiFi.getMode() == WIFI_STA) || (WiFi.getMode() == WIFI_AP_STA))WiFi.disconnect(true);
     if((WiFi.getMode() == WIFI_AP) || (WiFi.getMode() == WIFI_AP_STA))WiFi.softAPdisconnect(true);
     wifi_services.end();
+    WiFi.enableSTA (false);
+    WiFi.enableAP (false);
     WiFi.mode(WIFI_OFF);
     grbl_send(CLIENT_ALL,"\n[MSG:WiFi Off]\r\n");
 }
@@ -403,26 +405,32 @@ void WiFiConfig::begin() {
     //stop active services
     wifi_services.end();
     //setup events
-    WiFi.onEvent(WiFiConfig::WiFiEvent);
+    if (!_events_registered) {
+        //cumulative function and no remove so only do once 
+        WiFi.onEvent(WiFiConfig::WiFiEvent);
+        _events_registered = true;
+    }
     //open preferences as read-only
     prefs.begin(NAMESPACE, true);
     //Get hostname
     String defV = DEFAULT_HOSTNAME;
     _hostname = prefs.getString(HOSTNAME_ENTRY, defV);
     int8_t wifiMode = prefs.getChar(ESP_RADIO_MODE, DEFAULT_RADIO_MODE);
-    prefs.end();
+    
     if (wifiMode == ESP_WIFI_AP) {
        StartAP();
        //start services
        wifi_services.begin();
     } else if (wifiMode == ESP_WIFI_STA){
        if(!StartSTA()){
-           grbl_send(CLIENT_ALL,"[MSG:Cannot connect to AP]\r\n");
+		   defV = DEFAULT_STA_SSID;
+           grbl_sendf(CLIENT_ALL,"[MSG:Cannot connect to %s]\r\n", prefs.getString(STA_SSID_ENTRY, defV).c_str());
            StartAP();
        }
        //start services
        wifi_services.begin();
     }else WiFi.mode(WIFI_OFF);
+    prefs.end();
 }
 
 /**
@@ -446,6 +454,22 @@ void WiFiConfig::reset_settings(){
     if (prefs.putString(HOSTNAME_ENTRY, sval) == 0){
         error = true;
     }
+    
+    bbuf = DEFAULT_NOTIFICATION_TYPE;
+	if (prefs.putChar(NOTIFICATION_TYPE, bbuf) ==0 ) {
+		error = true;
+	}
+	sval = DEFAULT_TOKEN;
+	if (prefs.putString(NOTIFICATION_T1, sval) != sval.length()){
+		error = true;
+	}
+	if (prefs.putString(NOTIFICATION_T2, sval) != sval.length()){
+		error = true;
+	}  
+	if (prefs.putString(NOTIFICATION_TS, sval) != sval.length()){
+		error = true;
+	}  
+    
     sval = DEFAULT_STA_SSID;
     if (prefs.putString(STA_SSID_ENTRY, sval) == 0){
         error = true;

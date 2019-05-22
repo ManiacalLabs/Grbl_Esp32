@@ -93,8 +93,10 @@ void protocol_main_loop()
 					report_status_message(gc_execute_line(fileLine, SD_client), SD_client);
 				}
 				else {
-					closeFile(); // close file and clear SD ready/running flags
-					// TODO some type of alert
+					char temp[50];
+					sd_get_current_filename(temp);
+					grbl_notifyf("SD print done", "%s print is successful", temp);
+					closeFile(); // close file and clear SD ready/running flags					
 				}
 			}
 		#endif
@@ -183,7 +185,7 @@ void protocol_main_loop()
 							line[char_counter++] = c; // capture this character
 							
 						// TODO: Install '%' feature
-						// } else if (c == '%') {
+						} else if (c == '%') {
 							// Program start-end percent sign NOT SUPPORTED.
 							// NOTE: This maybe installed to tell Grbl when a program is running vs manual input,
 							// where, during a program, the system auto-cycle start will continue to execute

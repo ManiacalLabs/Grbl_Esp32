@@ -49,7 +49,6 @@
 void mc_line_kins(float *target, plan_line_data_t *pl_data, float *position);
 void mc_line(float *target, plan_line_data_t *pl_data);
 
-
 // Execute an arc in offset mode format. position == current xyz, target == target xyz,
 // offset == offset from current xyz, axis_XXX defines circle plane in tool space, axis_linear is
 // the direction of helical travel, radius == circle radius, is_clockwise_arc boolean. Used
@@ -71,7 +70,5 @@ void mc_parking_motion(float *parking_target, plan_line_data_t *pl_data);
 
 // Performs system reset. If in motion state, kills all motion and sets system alarm.
 void mc_reset();
-
-
 
 #endif

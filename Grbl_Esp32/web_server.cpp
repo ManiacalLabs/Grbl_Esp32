@@ -216,6 +216,9 @@ bool Web_Server::begin(){
 
 void Web_Server::end(){
     _setupdone = false;
+#ifdef ENABLE_SSDP
+    SSDP.end();
+#endif //ENABLE_SSDP
 #ifdef ENABLE_MDNS
     //remove mDNS
     mdns_service_remove("_http", "_tcp");
@@ -519,6 +522,10 @@ void Web_Server::handle_web_command ()
         uint8_t sindex = 0;
         scmd = get_Splited_Value(cmd,'\n', sindex);
         while ( scmd != "" ){
+        if ((scmd.length() == 2) && (scmd[0] == 0xC2)){
+              scmd[0]=scmd[1];
+              scmd.remove(1,1);
+            }  
         if (scmd.length() > 1)scmd += "\n";
         else if (!is_realtime_cmd(scmd[0]) )scmd += "\n";
         if (!Serial2Socket.push(scmd.c_str()))res = "Error";
@@ -1221,8 +1228,8 @@ void Web_Server::handle_direct_SDFileList()
         _upload_status = UPLOAD_STATUS_NONE;
     }
     bool list_files = true;
-    uint32_t totalspace = 0;
-    uint32_t usedspace = 0;
+    uint64_t totalspace = 0;
+    uint64_t usedspace = 0;
     if (get_sd_state(true) != SDCARD_IDLE) {
         _webserver->sendHeader("Cache-Control","no-cache");
         _webserver->send(200, "application/json", "{\"status\":\"No SD Card\"}");
