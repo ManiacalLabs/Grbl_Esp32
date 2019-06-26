@@ -18,14 +18,14 @@
   along with Grbl.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TMC2130_h
-	#define TMC2130_h
+#ifndef grbl_trinamic_h
+	#define grbl_trinamic_h
 
 #include "grbl.h"
-#include <TMC2130Stepper.h>
+#include <TMCStepper.h>
 
-#ifdef USE_TMC2130
-	void TMC2130_Init();
+#ifdef USE_TRINAMIC
+	void Trinamic_Init();	
 #endif
 
 #endif

@@ -26,6 +26,7 @@
 // used to delay turn on
 bool solenoid_pen_enable; 
 uint16_t solenoide_hold_count;
+static TaskHandle_t solenoidSyncTaskHandle = 0;
 
 void solenoid_init()
 {		

@@ -85,7 +85,7 @@
 #define SERVO_HOMING_OFF 0 // servo is off during homing
 #define SERVO_HOMING_TARGET 1 // servo is send to a location during homing
 
-static TaskHandle_t servosSyncTaskHandle = 0;
+//static TaskHandle_t servosSyncTaskHandle = 0;
 
 extern float my_location;
 

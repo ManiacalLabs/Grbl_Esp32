@@ -25,6 +25,7 @@
 
 // used to delay turn on
 bool servo_pen_enable = false;
+static TaskHandle_t servosSyncTaskHandle = 0;
 
 void servo_init()
 {

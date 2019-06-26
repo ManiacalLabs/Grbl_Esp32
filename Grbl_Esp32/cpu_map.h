@@ -181,8 +181,7 @@
 		#define CONTROL_CYCLE_START_PIN   GPIO_NUM_39  // needs external pullup    		
 		
 #endif
-		
-		
+				
 #ifdef CPU_MAP_PEN_LASER  // The Buildlog.net pen laser controller V1
 
 		// For pen mode be sure to uncomment #define USE_PEN_SERVO in config.h
@@ -624,7 +623,6 @@
 		
 #endif
 
-
 #ifdef CPU_MAP_SM // String art machine definition
 	
 
@@ -1002,17 +1000,26 @@
 		
 		#define USE_RMT_STEPS
 		
-		#define USE_TMC2130 // make sure you assign chip select pins to each axis
+		#define USE_TRINAMIC // make sure you assign chip select pins to each axis
+		 
 		
 		#define X_STEP_PIN      	GPIO_NUM_12
 		#define X_DIRECTION_PIN   	GPIO_NUM_26
 		#define X_CS_PIN    		GPIO_NUM_17  //chip select
 		#define X_RMT_CHANNEL		0		
+		#define X_DRIVER_TYPE_TMC2130 // see grbl_trinamic.h for valid types
+		#define X_R_SENSE 			0.11f
+		#define X_RMS_CURRENT 		200 // mA
+		#define X_MICROSTEPS		32
+		
 		
 		#define Y_STEP_PIN      	GPIO_NUM_14   
 		#define Y_DIRECTION_PIN   	GPIO_NUM_25  
 		#define Y_CS_PIN    		GPIO_NUM_16  //chip select	
 		#define Y_RMT_CHANNEL		1		
+		#define Y_DRIVER_TYPE_TMC2130 // see grbl_trinamic.h for valid types
+		#define Y_RMS_CURRENT 		200 // mA
+		#define Y_MICROSTEPS		32
 		
 		// OK to comment out to use pin for other features
 		#define STEPPERS_DISABLE_PIN GPIO_NUM_13		

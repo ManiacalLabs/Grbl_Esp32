@@ -84,7 +84,7 @@
 	#include "servo_axis.h"
 #endif
 
-#ifdef USE_TMC2130
-	#include "TMC2130.h" // https://github.com/teemuatlut/TMC2130Stepper
+#ifdef USE_TRINAMIC
+	#include "TMCStepper.h" // https://github.com/teemuatlut/TMC2130Stepper
 #endif
 
