@@ -39,9 +39,9 @@
 	#endif
 #endif
 
-void TMC2130_Init()
+void Trinamic_Init()
 {
-		#ifdef X_CS_PIN
+		#ifdef X_CS_PIN			
 			TMC2130_X.begin(); // Initiate pins and registries
 			TMC2130_X.microsteps(X_MICROSTEPS);
 			TMC2130_X.rms_current(X_RMS_CURRENT);

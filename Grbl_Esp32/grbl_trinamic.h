@@ -22,10 +22,10 @@
 	#define grbl_trinamic_h
 
 #include "grbl.h"
-#include <TMCStepper.h>
+#include <TMCStepper.h>  // https://github.com/teemuatlut/TMCStepper
 
 #ifdef USE_TRINAMIC
-	void Trinamic_Init();	
+	void Trinamic_Init();
 #endif
 
 #endif

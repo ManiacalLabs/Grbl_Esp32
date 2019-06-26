@@ -362,15 +362,15 @@ void IRAM_ATTR onStepperDriverTimer(void *para)  // ISR It is time to take a ste
 void stepper_init()
 {
 	
-	#ifdef USE_TMC2130
-		TMC2130_Init();
+	#ifdef USE_TRINAMIC
+		Trinamic_Init();
 	#endif
 	
 	#ifdef USE_RMT_STEPS
-		grbl_send(CLIENT_SERIAL, "[MSG:Using RMT Steps}\r\n");
+		grbl_send(CLIENT_SERIAL, "[MSG:Using RMT Steps]\r\n");
 		initRMT();
 	#else
-		grbl_send(CLIENT_SERIAL, "[MSG:Using Timed Steps}\r\n");
+		grbl_send(CLIENT_SERIAL, "[MSG:Using Timed Steps]\r\n");
 		// make the step pins outputs
 		#ifdef  X_STEP_PIN
 			pinMode(X_STEP_PIN, OUTPUT);

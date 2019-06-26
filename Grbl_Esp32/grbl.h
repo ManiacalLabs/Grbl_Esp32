@@ -85,6 +85,6 @@
 #endif
 
 #ifdef USE_TRINAMIC
-	#include "TMCStepper.h" // https://github.com/teemuatlut/TMC2130Stepper
+	#include "grbl_trinamic.h" 
 #endif
 
