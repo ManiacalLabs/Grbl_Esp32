@@ -1007,7 +1007,7 @@
 		#define X_DIRECTION_PIN   	GPIO_NUM_26
 		#define X_CS_PIN    		GPIO_NUM_17  //chip select
 		#define X_RMT_CHANNEL		0		
-		#define X_DRIVER_TYPE_TMC2130 // see grbl_trinamic.h for valid types
+		#define X_DRIVER_TYPE_TMC2130 // see TMCStepper.h for valid types
 		#define X_R_SENSE 			0.11f
 		#define X_RMS_CURRENT 		200 // mA
 		#define X_MICROSTEPS		32
@@ -1017,7 +1017,7 @@
 		#define Y_DIRECTION_PIN   	GPIO_NUM_25  
 		#define Y_CS_PIN    		GPIO_NUM_16  //chip select	
 		#define Y_RMT_CHANNEL		1		
-		#define Y_DRIVER_TYPE_TMC2130 // see grbl_trinamic.h for valid types
+		#define Y_DRIVER_TYPE_TMC2130 // see TMCStepper.h for valid types
 		#define Y_RMS_CURRENT 		200 // mA
 		#define Y_MICROSTEPS		32
 		
