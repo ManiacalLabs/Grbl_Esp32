@@ -25,6 +25,9 @@
 	#ifdef X_DRIVER_TYPE_TMC2130
 		TMC2130Stepper driver_X(X_CS_PIN);
 	#endif
+	#ifdef X_DRIVER_TYPE_TMC5160
+		TMC5160Stepper driver_X(X_CS_PIN);
+	#endif
 #endif
 
 #ifdef Y_CS_PIN
@@ -41,27 +44,29 @@
 
 void Trinamic_Init()
 {
-		#ifdef X_CS_PIN			
-			grbl_send(CLIENT_SERIAL, "[MSG: Init Trinamic X]\r\n");
-			driver_X.begin(); // Initiate pins and registries
-			driver_X.microsteps(X_MICROSTEPS);
-			driver_X.rms_current(X_RMS_CURRENT);
-			driver_X.en_pwm_mode(1); // Enable extremely quiet stepping			
-		#endif	
+	SPI.begin();                    // SPI drivers
+	#ifdef X_CS_PIN			
+		grbl_send(CLIENT_SERIAL, "[MSG: Init Trinamic X]\r\n");
+		driver_X.begin(); // Initiate pins and registries				
+		driver_X.microsteps(X_MICROSTEPS); 
+		driver_X.rms_current(X_RMS_CURRENT);
+	#endif	
 		
-		#ifdef Y_CS_PIN
-			grbl_send(CLIENT_SERIAL, "[MSG: Init Trinamic Y]\r\n");
-			driver_Y.begin(); // Initiate pins and registries
-			driver_Y.microsteps(Y_MICROSTEPS);
-			driver_Y.rms_current(Y_RMS_CURRENT);
-			driver_Y.en_pwm_mode(1); // Enable extremely quiet stepping
-		#endif
+	#ifdef Y_CS_PIN
+		grbl_send(CLIENT_SERIAL, "[MSG: Init Trinamic Y]\r\n");
+		driver_Y.begin(); // Initiate pins and registries
+		driver_Y.toff(5);
+		driver_Y.microsteps(X_MICROSTEPS);
+		driver_Y.rms_current(X_RMS_CURRENT);
+		driver_Y.pwm_autoscale(true);     // Needed for stealthChopg
+	#endif
 		
-		#ifdef Z_CS_PIN
-			grbl_send(CLIENT_SERIAL, "[MSG: Init Trinamic Z]\r\n");
-			driver_Z.begin(); // Initiate pins and registries
-			driver_Z.microsteps(Z_MICROSTEPS);
-			driver_Z.rms_current(Z_RMS_CURRENT);
-			driver_Z.stealthChop(1); // Enable extremely quiet stepping
-		#endif
+	#ifdef Z_CS_PIN
+		grbl_send(CLIENT_SERIAL, "[MSG: Init Trinamic Z]\r\n");
+		driver_Z.begin(); // Initiate pins and registries
+		driver_Z.toff(5);
+		driver_Z.microsteps(X_MICROSTEPS);
+		driver_Z.rms_current(X_RMS_CURRENT);
+		driver_Z.pwm_autoscale(true);     // Needed for stealthChop
+	#endif
 }

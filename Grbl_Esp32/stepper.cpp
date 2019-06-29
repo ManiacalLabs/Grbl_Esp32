@@ -362,6 +362,12 @@ void IRAM_ATTR onStepperDriverTimer(void *para)  // ISR It is time to take a ste
 void stepper_init()
 {
 	
+	// make the stepper disable pin an output
+	#ifdef STEPPERS_DISABLE_PIN
+		pinMode(STEPPERS_DISABLE_PIN, OUTPUT);
+		set_stepper_disable(true);
+	#endif
+	
 	#ifdef USE_TRINAMIC
 		Trinamic_Init();
 	#endif
@@ -407,11 +413,7 @@ void stepper_init()
 
 
 
-	// make the stepper disable pin an output
-	#ifdef STEPPERS_DISABLE_PIN
-		pinMode(STEPPERS_DISABLE_PIN, OUTPUT);
-		set_stepper_disable(true);
-	#endif
+	
 
 // setup stepper timer interrupt
 

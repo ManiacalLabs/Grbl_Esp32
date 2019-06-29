@@ -1009,7 +1009,7 @@
 		#define X_RMT_CHANNEL		0		
 		#define X_DRIVER_TYPE_TMC2130 // see TMCStepper.h for valid types
 		#define X_R_SENSE 			0.11f
-		#define X_RMS_CURRENT 		200 // mA
+		#define X_RMS_CURRENT 		400 // mA
 		#define X_MICROSTEPS		32
 		
 		
