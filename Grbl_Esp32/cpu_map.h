@@ -1069,6 +1069,10 @@
 		#define CS_STEPPER			GPIO_NUM_17
 		#define DRIVER_COUNT		4 // number of drivers...not axes		
 		
+		#define A_AXIS 3
+		//#define B_AXIX 4
+		//#define C_AXIS 5
+		
 		#define X_STEP_PIN      	GPIO_NUM_12
 		#define X_DIRECTION_PIN   	GPIO_NUM_14		
 		#define X_RMS_CURRENT 		800 // mA
@@ -1148,15 +1152,24 @@
 		#define X_STEP_BIT    0  // don't change
 		#define Y_STEP_BIT    1  // don't change
 		#define Z_STEP_BIT    2  // don't change
-		#define STEP_MASK       B111 // don't change
+		#define A_STEP_BIT    3  // don't change
+		#define B_STEP_BIT    4  // don't change
+		#define C_STEP_BIT    5  // don't change
+		#define STEP_MASK       B111111 // don't change
 		
 		#define X_DIRECTION_BIT   0 // don't change
 		#define Y_DIRECTION_BIT   1  // don't change
 		#define Z_DIRECTION_BIT   2  // don't change
+		#define A_DIRECTION_BIT   3 // don't change
+		#define B_DIRECTION_BIT   4  // don't change
+		#define C_DIRECTION_BIT   5  // don't change
 		
 		#define X_LIMIT_BIT      	0  // don't change
 		#define Y_LIMIT_BIT      	1  // don't change
 		#define Z_LIMIT_BIT     	2  // don't change
+		#define A_LIMIT_BIT      	3  // don't change
+		#define B_LIMIT_BIT      	4  // don't change
+		#define C_LIMIT_BIT     	5  // don't change
 		
 		
 		#define PROBE_MASK        1 // don't change		
