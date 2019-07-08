@@ -21,36 +21,90 @@
 
 #include "grbl.h"
 
-#ifdef X_CS_PIN
-	#ifdef X_DRIVER_TYPE_TMC2130
-		TMC2130Stepper driver_X(X_CS_PIN);
-	#endif
-	#ifdef X_DRIVER_TYPE_TMC5160
-		TMC5160Stepper driver_X(X_CS_PIN);
+#ifdef USE_TRINAMIC
+	#ifdef USE_SPI_DAISY_CHAIN
+		#ifdef DRIVER_TYPE_TMC2130
+			TMC2130Stepper driver(CS_STEPPER);
+		#endif
+		#ifdef DRIVER_TYPE_TMC5160
+			TMC5160Stepper driver(CS_STEPPER);			
+		#endif
+	#else
+		#ifdef X_CS_PIN
+			#ifdef X_DRIVER_TYPE_TMC2130
+				TMC2130Stepper driver_X(X_CS_PIN);
+			#endif
+			#ifdef X_DRIVER_TYPE_TMC5160
+				TMC5160Stepper driver_X(X_CS_PIN);
+			#endif
+		#endif
+
+		#ifdef Y_CS_PIN
+			#ifdef Y_DRIVER_TYPE_TMC2130
+				TMC2130Stepper driver_Y(Y_CS_PIN);
+			#endif
+			#ifdef Y_DRIVER_TYPE_TMC5160
+				TMC5160Stepper driver_Y(Y_CS_PIN);
+			#endif
+		#endif
+
+		#ifdef Z_CS_PIN
+			#ifdef Z_DRIVER_TYPE_TMC2130
+				TMC2130Stepper driver_Z(Z_CS_PIN);
+			#endif
+			#ifdef Z_DRIVER_TYPE_TMC5160
+				TMC5160Stepper driver_Z(Z_CS_PIN);
+			#endif
+		#endif
 	#endif
 #endif
 
-#ifdef Y_CS_PIN
-	#ifdef Y_DRIVER_TYPE_TMC2130
-		TMC2130Stepper driver_Y(Y_CS_PIN);
-	#endif
-#endif
-
-#ifdef Z_CS_PIN
-	#ifdef Z_DRIVER_TYPE_TMC2130
-		TMC2130Stepper driver_Z(Z_CS_PIN);
-	#endif
-#endif
 
 void Trinamic_Init()
 {
+	grbl_send(CLIENT_SERIAL, "[MSG: Trinamic Init]\r\n");
 	SPI.begin();                    // SPI drivers
-	#ifdef X_CS_PIN			
-		grbl_send(CLIENT_SERIAL, "[MSG: Init Trinamic X]\r\n");
+	
+	#ifdef USE_SPI_DAISY_CHAIN
+		grbl_send(CLIENT_SERIAL, "[MSG: CS Daisy Chain]\r\n");
+		driver.set_axis_count(4);		
+		
+		#ifdef X_STEP_PIN
+			driver.set_axis(X_AXIS);
+			driver.begin();
+			driver.microsteps(X_MICROSTEPS);
+			driver.rms_current(X_RMS_CURRENT);
+		#endif
+		
+		#ifdef Y_STEP_PIN
+			driver.set_axis(Y_AXIS);
+			driver.begin();
+			driver.microsteps(Y_MICROSTEPS);
+			driver.rms_current(Y_RMS_CURRENT);
+		#endif
+		
+		#ifdef Z_STEP_PIN
+			driver.set_axis(Z_AXIS);
+			driver.begin();
+			driver.microsteps(Z_MICROSTEPS);
+			driver.rms_current(Z_RMS_CURRENT);
+		#endif
+		
+		#ifdef A_STEP_PIN
+			driver.set_axis(A_AXIS);
+			driver.begin();
+			driver.microsteps(A_MICROSTEPS);
+			driver.rms_current(A_RMS_CURRENT);
+		#endif		
+		
+	#else	
+		grbl_send(CLIENT_SERIAL, "[MSG: CS Multiple]\r\n");		
 		driver_X.begin(); // Initiate pins and registries				
-		driver_X.microsteps(X_MICROSTEPS); 
-		driver_X.rms_current(X_RMS_CURRENT);
+		driver_X.microsteps(X_MICROSTEPS);
+		driver_X.rms_current(X_RMS_CURRENT);		
 	#endif	
+	
+	/*
 		
 	#ifdef Y_CS_PIN
 		grbl_send(CLIENT_SERIAL, "[MSG: Init Trinamic Y]\r\n");
@@ -69,4 +123,6 @@ void Trinamic_Init()
 		driver_Z.rms_current(X_RMS_CURRENT);
 		driver_Z.pwm_autoscale(true);     // Needed for stealthChop
 	#endif
+	
+	*/
 }

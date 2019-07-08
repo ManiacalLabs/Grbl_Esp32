@@ -1055,7 +1055,81 @@
 		
 #endif
 
-
+#ifdef CPU_MAP_4AXIS_SPI 
+		
+		#define CPU_MAP_NAME "CPU_MAP_4AXIS_SPI"
+		
+		#define USE_RMT_STEPS
+		
+		#define USE_TRINAMIC			// use SPI type drivers		
+		
+		#define USE_SPI_DAISY_CHAIN 	// drivers are daisy chained and share the same CS (CS_STEPPER)
+		#define DRIVER_TYPE_TMC2130   // all drivers in daisy chain must be the same type	
+		//#define DRIVER_TYPE_TMC5160   // all drivers in daisy chain must be the same type		
+		#define CS_STEPPER			GPIO_NUM_17
+		#define DRIVER_COUNT		4 // number of drivers...not axes		
+		
+		#define X_STEP_PIN      	GPIO_NUM_12
+		#define X_DIRECTION_PIN   	GPIO_NUM_14		
+		#define X_RMS_CURRENT 		800 // mA
+		#define X_MICROSTEPS		256
+		#define X_RMT_CHANNEL		0		
+		
+		#define Y_STEP_PIN      	GPIO_NUM_27   
+		#define Y_DIRECTION_PIN   	GPIO_NUM_26  
+		#define Y_RMT_CHANNEL		1
+		#define Y_RMS_CURRENT 		800 // mA
+		#define Y_MICROSTEPS		128
+		
+		#define Z_STEP_PIN      	GPIO_NUM_15		
+		#define Z_DIRECTION_PIN   	GPIO_NUM_2  
+		#define Z_RMT_CHANNEL		2			
+		#define Z_RMS_CURRENT 		800 // mA
+		#define Z_MICROSTEPS		64
+		
+		#define A_STEP_PIN      	GPIO_NUM_33		
+		#define A_DIRECTION_PIN   	GPIO_NUM_32  
+		#define A_RMT_CHANNEL		3			
+		#define A_RMS_CURRENT 		800 // mA
+		#define A_MICROSTEPS		32
+		
+		// OK to comment out to use pin for other features
+		#define STEPPERS_DISABLE_PIN 	GPIO_NUM_13	
+		
+				
+		// If SPINDLE_PWM_PIN is commented out, this frees up the pin, but Grbl will still
+		// use a virtual spindle. Do not comment out the other parameters for the spindle.
+		#define SPINDLE_PWM_PIN    		GPIO_NUM_25
+		#define SPINDLE_ENABLE_PIN		GPIO_NUM_4
+		#define SPINDLE_PWM_CHANNEL 	0
+		// PWM Generator is based on 80,000,000 Hz counter
+		// Therefor the freq determines the resolution
+		// 80,000,000 / freq = max resolution
+		// For 5000 that is 80,000,000 / 5000 = 16000 
+		// round down to nearest bit count for SPINDLE_PWM_MAX_VALUE = 13bits (8192)
+		#define SPINDLE_PWM_BASE_FREQ 		5000 // Hz
+		#define SPINDLE_PWM_BIT_PRECISION 	8   // be sure to match this with SPINDLE_PWM_MAX_VALUE
+		#define SPINDLE_PWM_OFF_VALUE     	0
+		#define SPINDLE_PWM_MAX_VALUE     	255 // (2^SPINDLE_PWM_BIT_PRECISION)
+		
+		#ifndef SPINDLE_PWM_MIN_VALUE
+				#define SPINDLE_PWM_MIN_VALUE   1   // Must be greater than zero.
+		#endif
+		
+		#define SPINDLE_PWM_RANGE         (SPINDLE_PWM_MAX_VALUE-SPINDLE_PWM_MIN_VALUE)		
+		
+		#define X_LIMIT_PIN      	GPIO_NUM_36 
+		#define Y_LIMIT_PIN      	GPIO_NUM_39  
+		#define Z_LIMIT_PIN			GPIO_NUM_34
+		#define A_LIMIT_PIN			GPIO_NUM_35
+		#define LIMIT_MASK      	B1111
+		
+		#define PROBE_PIN       	GPIO_NUM_22
+		
+		#define COOLANT_MIST_PIN   	GPIO_NUM_21
+		
+		
+#endif
 
 	// ================= common to all machines ================================
 	
