@@ -73,7 +73,16 @@ void Trinamic_Init()
 			driver.set_axis(X_AXIS);
 			driver.begin();
 			driver.microsteps(X_MICROSTEPS);
-			driver.rms_current(X_RMS_CURRENT);
+			//driver.rms_current(X_RMS_CURRENT);	
+			driver.irun(24);
+			if (settings.stepper_idle_lock_time == 255) {
+				driver.ihold(5);	
+				driver.iholddelay(6);
+				driver.TPOWERDOWN(10);
+			}
+			else {
+				driver.ihold(0);
+			}			
 		#endif
 		
 		#ifdef Y_STEP_PIN

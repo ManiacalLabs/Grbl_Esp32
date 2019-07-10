@@ -1075,15 +1075,15 @@
 		
 		#define X_STEP_PIN      	GPIO_NUM_12
 		#define X_DIRECTION_PIN   	GPIO_NUM_14		
-		#define X_RMS_CURRENT 		800 // mA
-		#define X_MICROSTEPS		256
+		#define X_RMS_CURRENT 		1200 // mA
+		#define X_MICROSTEPS		32
 		#define X_RMT_CHANNEL		0		
 		
 		#define Y_STEP_PIN      	GPIO_NUM_27   
 		#define Y_DIRECTION_PIN   	GPIO_NUM_26  
 		#define Y_RMT_CHANNEL		1
 		#define Y_RMS_CURRENT 		800 // mA
-		#define Y_MICROSTEPS		128
+		#define Y_MICROSTEPS		32
 		
 		#define Z_STEP_PIN      	GPIO_NUM_15		
 		#define Z_DIRECTION_PIN   	GPIO_NUM_2  

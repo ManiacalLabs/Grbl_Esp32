@@ -831,6 +831,8 @@ void st_go_idle()
 	// Disable Stepper Driver Interrupt. Allow Stepper Port Reset Interrupt to finish, if active.
 	Stepper_Timer_Stop();
 	busy = false;
+	
+	
 
 	bool pin_state = false;
 	// Set stepper driver idle state, disabled or enabled, depending on settings and circumstances.
@@ -1427,11 +1429,15 @@ void IRAM_ATTR Stepper_Timer_Stop()
 
 
 void set_stepper_disable(uint8_t isOn)  // isOn = true // to disable
-{
+{	
+	#ifdef TRINAMIC
+		return;
+	#endif
+	
 	if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) {
 		isOn = !isOn;    // Apply pin invert.
 	}
-
+	
 #ifdef STEPPERS_DISABLE_PIN
 	digitalWrite(STEPPERS_DISABLE_PIN, isOn );
 #endif
