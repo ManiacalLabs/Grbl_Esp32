@@ -2,10 +2,10 @@
   spindle_control.cpp - Header for system level commands and real-time processes
   Part of Grbl
   Copyright (c) 2014-2016 Sungeun K. Jeon for Gnea Research LLC
-	
+
 	2018 -	Bart Dring This file was modified for use on the ESP32
 					CPU. Do not use this with Grbl for atMega328P
-	
+
   Grbl is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
@@ -25,58 +25,62 @@ static float pwm_gradient; // Precalulated value to speed up rpm to PWM conversi
 void spindle_init()
 {
     pwm_gradient = SPINDLE_PWM_RANGE/(settings.rpm_max-settings.rpm_min);
-	
+
 	// Use DIR and Enable if pins are defined
 	#ifdef SPINDLE_ENABLE_PIN
 		pinMode(SPINDLE_ENABLE_PIN, OUTPUT);
 	#endif
-	
+
 	#ifdef SPINDLE_DIR_PIN
 		pinMode(SPINDLE_DIR_PIN, OUTPUT);
 	#endif
-	
+
 	#ifdef SPINDLE_PWM_PIN
     // use the LED control feature to setup PWM   https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/peripherals/ledc.html
     ledcSetup(SPINDLE_PWM_CHANNEL, SPINDLE_PWM_BASE_FREQ, SPINDLE_PWM_BIT_PRECISION); // setup the channel
     ledcAttachPin(SPINDLE_PWM_PIN, SPINDLE_PWM_CHANNEL); // attach the PWM to the pin
 	#endif
-	
+
     // Start with spindle off off
 	  spindle_stop();
 }
 
 void spindle_stop()
-{		
+{
   spindle_set_enable(false);
 	#ifdef SPINDLE_PWM_PIN
 		grbl_analogWrite(SPINDLE_PWM_CHANNEL, SPINDLE_PWM_OFF_VALUE);
 	#endif
+
+  #ifdef USE_SERVO_AXES
+    deploy_z(0.0);
+  #endif
 }
 
 uint8_t spindle_get_state()  // returns SPINDLE_STATE_DISABLE, SPINDLE_STATE_CW or SPINDLE_STATE_CCW
-{	  
+{
   // TODO Update this when direction and enable pin are added
 	#ifndef SPINDLE_PWM_PIN
 		return(SPINDLE_STATE_DISABLE);
 	#endif
-	
-	if (ledcRead(SPINDLE_PWM_CHANNEL) == 0) // Check the PWM value		
+
+	if (ledcRead(SPINDLE_PWM_CHANNEL) == 0) // Check the PWM value
 		return(SPINDLE_STATE_DISABLE);
 	else
 	{
-		#ifdef SPINDLE_DIR_PIN			
+		#ifdef SPINDLE_DIR_PIN
 			if (digitalRead(SPINDLE_DIR_PIN))
 				return (SPINDLE_STATE_CW);
 			else
 				return(SPINDLE_STATE_CCW);
 		#else
 			return(SPINDLE_STATE_CW);
-		#endif		
+		#endif
 	}
 }
 
 void spindle_set_speed(uint32_t pwm_value)
-{	
+{
 	#ifndef SPINDLE_PWM_PIN
 		return;
 	#endif
@@ -121,23 +125,31 @@ uint32_t spindle_compute_pwm_value(float rpm)
 void spindle_set_state(uint8_t state, float rpm)
 {
   if (sys.abort) { return; } // Block during abort.
-  if (state == SPINDLE_DISABLE) { // Halt or set spindle direction and rpm.    
-    sys.spindle_speed = 0.0;    
-    spindle_stop();  
+  if (state == SPINDLE_DISABLE) { // Halt or set spindle direction and rpm.
+    sys.spindle_speed = 0.0;
+    spindle_stop();
   } else {
-  
+
     // TODO ESP32 Enable and direction control
-		#ifdef SPINDLE_DIR_PIN		
-      digitalWrite(SPINDLE_DIR_PIN, state == SPINDLE_ENABLE_CW);    
-		#endif  
-    
+		#ifdef SPINDLE_DIR_PIN
+      digitalWrite(SPINDLE_DIR_PIN, state == SPINDLE_ENABLE_CW);
+		#endif
+
       // NOTE: Assumes all calls to this function is when Grbl is not moving or must remain off.
-      if (settings.flags & BITFLAG_LASER_MODE) { 
+      if (settings.flags & BITFLAG_LASER_MODE) {
         if (state == SPINDLE_ENABLE_CCW) { rpm = 0.0; } // TODO: May need to be rpm_min*(100/MAX_SPINDLE_SPEED_OVERRIDE);
       }
-						
-      spindle_set_speed(spindle_compute_pwm_value(rpm));     
-  }  
+
+
+      #ifdef SERVO_Z_PIN
+        // grbl_send(CLIENT_SERIAL, "[MSG:Spindle Speed: ");
+        // grbl_send(CLIENT_SERIAL, String(rpm).c_str());
+        // grbl_send(CLIENT_SERIAL, "]\r\n");
+        deploy_z(mapConstrain(rpm, settings.rpm_min, settings.rpm_max, 0.0, 1.0));
+      #else
+        spindle_set_speed(spindle_compute_pwm_value(rpm));
+      #endif
+  }
   sys.report_ovr_counter = 0; // Set to report change immediately
 }
 
@@ -161,7 +173,7 @@ void grbl_analogWrite(uint8_t chan, uint32_t duty)
 
 void spindle_set_enable(bool enable)
 {
-	#ifdef SPINDLE_ENABLE_PIN	
+	#ifdef SPINDLE_ENABLE_PIN
 		#ifndef INVERT_SPINDLE_ENABLE_PIN
 				digitalWrite(SPINDLE_ENABLE_PIN, enable); // turn off (low) with zero speed
 		#else

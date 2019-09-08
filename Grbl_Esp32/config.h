@@ -4,7 +4,7 @@
 
   Copyright (c) 2012-2016 Sungeun K. Jeon for Gnea Research LLC
   Copyright (c) 2009-2011 Simen Svale Skogsrud
-	
+
 	2018 -	Bart Dring This file was modifed for use on the ESP32
 					CPU. Do not use this with Grbl for atMega328P
 
@@ -40,14 +40,15 @@ Some features should not be changed. See notes below.
 #include <Arduino.h>
 
 //#define ESP_DEBUG
-#define N_AXIS 3 // Number of axes defined (valid range: 3 to 6) 
+#define N_AXIS 3 // Number of axes defined (valid range: 3 to 6)
 
 // Define CPU pin map and default settings.
 // NOTE: OEMs can avoid the need to maintain/update the defaults.h and cpu_map.h files and use only
 // one configuration file by placing their specific defaults and pin map at the bottom of this file.
 // If doing so, simply comment out these two defines and see instructions below.
 #define DEFAULTS_GENERIC
-#define CPU_MAP_ESP32 // these are defined in cpu_map.h
+// #define CPU_MAP_ESP32 // these are defined in cpu_map.h
+#define CPU_MAP_PEN_LASER
 #define VERBOSE_HELP // adds addition help info, but could confuse some senders
 
 
@@ -172,22 +173,22 @@ Some features should not be changed. See notes below.
 //#define HOMING_CYCLE_1 ((1<<X_AXIS)|(1<<Y_AXIS))  // OPTIONAL: Then move X,Y at the same time.
 // #define HOMING_CYCLE_2                         // OPTIONAL: Uncomment and add axes mask to enable
 
-#define HOMING_CYCLE_0 (1<<Z_AXIS)                // REQUIRED: First move Z to clear workspace.
-#define HOMING_CYCLE_1 (1<<X_AXIS)  
-#define HOMING_CYCLE_2 (1<<Y_AXIS)
+// #define HOMING_CYCLE_0 (1<<Z_AXIS)                // REQUIRED: First move Z to clear workspace.
+// #define HOMING_CYCLE_1 (1<<X_AXIS)
+// #define HOMING_CYCLE_2 (1<<Y_AXIS)
 
 // NOTE: The following are two examples to setup homing for 2-axis machines.
-// #define HOMING_CYCLE_0 ((1<<X_AXIS)|(1<<Y_AXIS))  // NOT COMPATIBLE WITH COREXY: Homes both X-Y in one cycle. 
+// #define HOMING_CYCLE_0 ((1<<X_AXIS)|(1<<Y_AXIS))  // NOT COMPATIBLE WITH COREXY: Homes both X-Y in one cycle.
 
-// #define HOMING_CYCLE_0 (1<<X_AXIS)  // COREXY COMPATIBLE: First home X
-// #define HOMING_CYCLE_1 (1<<Y_AXIS)  // COREXY COMPATIBLE: Then home Y
+#define HOMING_CYCLE_0 (1<<X_AXIS)  // COREXY COMPATIBLE: First home X
+#define HOMING_CYCLE_1 (1<<Y_AXIS)  // COREXY COMPATIBLE: Then home Y
 
 // Number of homing cycles performed after when the machine initially jogs to limit switches.
 // This help in preventing overshoot and should improve repeatability. This value should be one or
 // greater.
 #define N_HOMING_LOCATE_CYCLE 1 // Integer (1-128)
 
-// Enables single axis homing commands. $HX, $HY, and $HZ for X, Y, and Z-axis homing. The full homing 
+// Enables single axis homing commands. $HX, $HY, and $HZ for X, Y, and Z-axis homing. The full homing
 // cycle is still invoked by the $H command. This is disabled by default. It's here only to address
 // users that need to switch between a two-axis and three-axis machine. This is actually very rare.
 // If you have a two-axis machine, DON'T USE THIS. Instead, just alter the homing cycle for two-axes.
@@ -284,7 +285,7 @@ Some features should not be changed. See notes below.
 //#define IGNORE_CONTROL_PINS
 
 //#define ENABLE_CONTROL_SW_DEBOUNCE // Default disabled. Uncomment to enable.
-#define CONTROL_SW_DEBOUNCE_PERIOD 32 // in milliseconds default 32 microseconds 
+#define CONTROL_SW_DEBOUNCE_PERIOD 32 // in milliseconds default 32 microseconds
 
 
 // Inverts select limit pin states based on the following mask. This effects all limit pin functions,
@@ -354,7 +355,7 @@ Some features should not be changed. See notes below.
 
 // The status report change for Grbl v1.1 and after also removed the ability to disable/enable most data
 // fields from the report. This caused issues for GUI developers, who've had to manage several scenarios
-// and configurations. The increased efficiency of the new reporting style allows for all data fields to 
+// and configurations. The increased efficiency of the new reporting style allows for all data fields to
 // be sent without potential performance issues.
 // NOTE: The options below are here only provide a way to disable certain data fields if a unique
 // situation demands it, but be aware GUIs may depend on this data. If disabled, it may not be compatible.
@@ -445,16 +446,16 @@ Some features should not be changed. See notes below.
 // preserve I/O pins. For certain setups, these may need to be separate pins. This configure option uses
 // the spindle direction pin(D13) as a separate spindle enable pin along with spindle speed PWM on pin D11.
 // NOTE: This configure option only works with VARIABLE_SPINDLE enabled and a 328p processor (Uno).
-// NOTE: Without a direction pin, M4 will not have a pin output to indicate a difference with M3. 
+// NOTE: Without a direction pin, M4 will not have a pin output to indicate a difference with M3.
 // NOTE: BEWARE! The Arduino bootloader toggles the D13 pin when it powers up. If you flash Grbl with
 // a programmer (you can use a spare Arduino as "Arduino as ISP". Search the web on how to wire this.),
 // this D13 LED toggling should go away. We haven't tested this though. Please report how it goes!
 // #define USE_SPINDLE_DIR_AS_ENABLE_PIN // Default disabled. Uncomment to enable.
 
 // Alters the behavior of the spindle enable pin with the USE_SPINDLE_DIR_AS_ENABLE_PIN option . By default,
-// Grbl will not disable the enable pin if spindle speed is zero and M3/4 is active, but still sets the PWM 
+// Grbl will not disable the enable pin if spindle speed is zero and M3/4 is active, but still sets the PWM
 // output to zero. This allows the users to know if the spindle is active and use it as an additional control
-// input. However, in some use cases, user may want the enable pin to disable with a zero spindle speed and 
+// input. However, in some use cases, user may want the enable pin to disable with a zero spindle speed and
 // re-enable when spindle speed is greater than zero. This option does that.
 // NOTE: Requires USE_SPINDLE_DIR_AS_ENABLE_PIN to be enabled.
 // #define SPINDLE_ENABLE_OFF_WITH_ZERO_SPEED // Default disabled. Uncomment to enable.
@@ -564,8 +565,8 @@ Some features should not be changed. See notes below.
 // #define RX_BUFFER_SIZE 128 // (1-254) Uncomment to override defaults in serial.h
 // #define TX_BUFFER_SIZE 100 // (1-254)
 
-// A simple software debouncing feature for hard limit switches. When enabled, the limit 
-// switch interrupt unblock a waiting task which will recheck the limit switch pins after 
+// A simple software debouncing feature for hard limit switches. When enabled, the limit
+// switch interrupt unblock a waiting task which will recheck the limit switch pins after
 // a short delay. Default disabled
 //#define ENABLE_SOFTWARE_DEBOUNCE // Default disabled. Uncomment to enable.
 #define DEBOUNCE_PERIOD 32 // in milliseconds default 32 microseconds
@@ -641,8 +642,8 @@ Some features should not be changed. See notes below.
 #define FORCE_BUFFER_SYNC_DURING_WCO_CHANGE // Default enabled. Comment to disable.
 
 // By default, Grbl disables feed rate overrides for all G38.x probe cycle commands. Although this
-// may be different than some pro-class machine control, it's arguable that it should be this way. 
-// Most probe sensors produce different levels of error that is dependent on rate of speed. By 
+// may be different than some pro-class machine control, it's arguable that it should be this way.
+// Most probe sensors produce different levels of error that is dependent on rate of speed. By
 // keeping probing cycles to their programmed feed rates, the probe sensor should be a lot more
 // repeatable. If needed, you can disable this behavior by uncommenting the define below.
 // #define ALLOW_FEED_OVERRIDE_DURING_PROBE_CYCLES // Default disabled. Uncomment to enable.
@@ -670,11 +671,11 @@ Some features should not be changed. See notes below.
 #define PARKING_PULLOUT_INCREMENT 5.0 // Spindle pull-out and plunge distance in mm. Incremental distance.
                                       // Must be positive value or equal to zero.
 
-// Enables a special set of M-code commands that enables and disables the parking motion. 
-// These are controlled by `M56`, `M56 P1`, or `M56 Px` to enable and `M56 P0` to disable. 
-// The command is modal and will be set after a planner sync. Since it is g-code, it is 
+// Enables a special set of M-code commands that enables and disables the parking motion.
+// These are controlled by `M56`, `M56 P1`, or `M56 Px` to enable and `M56 P0` to disable.
+// The command is modal and will be set after a planner sync. Since it is g-code, it is
 // executed in sync with g-code commands. It is not a real-time command.
-// NOTE: PARKING_ENABLE is required. By default, M56 is active upon initialization. Use 
+// NOTE: PARKING_ENABLE is required. By default, M56 is active upon initialization. Use
 // DEACTIVATE_PARKING_UPON_INIT to set M56 P0 as the power-up default.
 // #define ENABLE_PARKING_OVERRIDE_CONTROL   // Default disabled. Uncomment to enable
 // #define DEACTIVATE_PARKING_UPON_INIT // Default disabled. Uncomment to enable.
@@ -686,7 +687,7 @@ Some features should not be changed. See notes below.
 #define DISABLE_LASER_DURING_HOLD // Default enabled. Comment to disable.
 
 // Enables a piecewise linear model of the spindle PWM/speed output. Requires a solution by the
-// 'fit_nonlinear_spindle.py' script in the /doc/script folder of the repo. See file comments 
+// 'fit_nonlinear_spindle.py' script in the /doc/script folder of the repo. See file comments
 // on how to gather spindle data and run the script to generate a solution.
 // #define ENABLE_PIECEWISE_LINEAR_SPINDLE  // Default disabled. Uncomment to enable.
 
